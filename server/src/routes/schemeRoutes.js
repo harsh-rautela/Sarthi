@@ -1,0 +1,2 @@
+import { Router } from 'express'; import { listSchemes,getScheme,createScheme,updateScheme,deleteScheme } from '../controllers/schemeController.js'; import {protect,adminOnly} from '../middleware/auth.js';
+const r=Router(); r.get('/',listSchemes); r.get('/:id',getScheme); r.post('/',protect,adminOnly,createScheme); r.put('/:id',protect,adminOnly,updateScheme); r.delete('/:id',protect,adminOnly,deleteScheme); export default r;
