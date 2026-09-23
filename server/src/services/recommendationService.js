@@ -19,6 +19,9 @@ function calculateAffinityBoost(profile = {}, scheme = {}) {
   } else if (['unemployed', 'job seeker'].includes(occ) || profile.employmentStatus === 'Job Seeker') {
     if (category.includes('employment') || category.includes('skill')) boost += 8;
   }
+  else if (['unemployed', 'job seeker'].includes(occ) || profile.employmentStatus === 'Job Seeker') {
+    if ( category.includes('skill')) boost += 8;x
+  }
 
   // Gender Affinity
   if (gender === 'female' && (category.includes('women') || scheme.name?.toLowerCase().includes('mahila') || scheme.name?.toLowerCase().includes('behna') || scheme.name?.toLowerCase().includes('ladli') || scheme.name?.toLowerCase().includes('kanya'))) {

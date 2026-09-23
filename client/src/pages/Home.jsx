@@ -1,6 +1,82 @@
-import { Link } from 'react-router-dom'; import { Search, ShieldCheck, Sparkles } from 'lucide-react';
-export default function Home(){return <div className="min-h-screen bg-gradient-to-b from-emerald-950 via-emerald-900 to-slate-50">
- <header className="container-page flex h-20 items-center justify-between text-white"><div className="text-xl font-bold">SchemeSathi</div><div className="flex gap-2"><Link to="/login" className="rounded-xl border border-white/30 px-4 py-2 font-semibold">Login</Link><Link to="/register" className="rounded-xl bg-white px-4 py-2 font-semibold text-emerald-900">Create account</Link></div></header>
- <section className="container-page grid min-h-[620px] items-center gap-10 py-16 text-white lg:grid-cols-2"><div><div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm"><Sparkles size={16}/> Government scheme discovery, simplified</div><h1 className="max-w-2xl text-5xl font-black leading-tight">Find welfare schemes that match your profile.</h1><p className="mt-6 max-w-xl text-lg leading-8 text-emerald-50">Search schemes, understand eligibility, save useful programs and get profile-based recommendations with transparent rule checks.</p><div className="mt-8 flex flex-wrap gap-3"><Link to="/register" className="rounded-xl bg-white px-5 py-3 font-bold text-emerald-900">Get started</Link><Link to="/schemes" className="rounded-xl border border-white/30 px-5 py-3 font-bold">Browse schemes</Link></div></div>
- <div className="rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur"><div className="grid gap-4 sm:grid-cols-3">{[[Search,'Centralized search'],[ShieldCheck,'Explainable eligibility'],[Sparkles,'AI-assisted answers']].map(([I,t])=><div className="rounded-2xl bg-white p-5 text-emerald-950" key={t}><I className="mb-4"/><div className="font-bold">{t}</div></div>)}</div><div className="mt-5 rounded-2xl bg-white p-6 text-slate-900"><p className="text-sm font-semibold text-emerald-700">Example recommendation</p><h3 className="mt-2 text-xl font-bold">Education Scholarship</h3><div className="mt-4 space-y-2 text-sm text-slate-600"><div>✓ Age requirement matched</div><div>✓ Income threshold matched</div><div>✓ Education matched</div><div>✓ Category matched</div></div></div></div>
- </section></div>}
+import { Link } from "react-router-dom";
+import { Search, ShieldCheck, Sparkles } from "lucide-react";
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-emerald-950 via-emerald-900 to-slate-50">
+      <header className="container-page flex h-20 items-center justify-between text-white">
+        <div className="text-xl font-bold">SchemeSathi</div>
+        <div className="flex gap-2">
+          <Link
+            to="/login"
+            className="rounded-xl border border-white/30 px-4 py-2 font-semibold"
+          >
+            Login
+          </Link>
+          <Link
+            to="/register"
+            className="rounded-xl bg-white px-4 py-2 font-semibold text-emerald-900"
+          >
+            Create account
+          </Link>
+        </div>
+      </header>
+      <section className="container-page grid min-h-[620px] items-center gap-10 py-16 text-white lg:grid-cols-2">
+        <div>
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm">
+            <Sparkles size={16} /> Government scheme discovery, simplified
+          </div>
+          <h1 className="max-w-2xl text-5xl font-black leading-tight">
+            Find welfare schemes that match your profile.
+          </h1>
+          <p className="mt-6 max-w-xl text-lg leading-8 text-emerald-50">
+            Search schemes, understand eligibility, save useful programs and get
+            profile-based recommendations with transparent rule checks.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-3">
+            <Link
+              to="/register"
+              className="rounded-xl bg-white px-5 py-3 font-bold text-emerald-900"
+            >
+              Get started
+            </Link>
+            <Link
+              to="/schemes"
+              className="rounded-xl border border-white/30 px-5 py-3 font-bold"
+            >
+              Browse schemes
+            </Link>
+          </div>
+        </div>
+        <div className="rounded-3xl border border-white/20 bg-white/10 p-6 backdrop-blur">
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              [Search, "Centralized search"],
+              [ShieldCheck, "Explainable eligibility"],
+              [Sparkles, "AI-assisted answers"],
+            ].map(([I, t]) => (
+              <div
+                className="rounded-2xl bg-white p-5 text-emerald-950"
+                key={t}
+              >
+                <I className="mb-4" />
+                <div className="font-bold">{t}</div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-5 rounded-2xl bg-white p-6 text-slate-900">
+            <p className="text-sm font-semibold text-emerald-700">
+              Example recommendation
+            </p>
+            <h3 className="mt-2 text-xl font-bold">Education Scholarship</h3>
+            <div className="mt-4 space-y-2 text-sm text-slate-600">
+              <div>✓ Age requirement matched</div>
+              <div>✓ Income threshold matched</div>
+              <div>✓ Education matched</div>
+              <div>✓ Category matched</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}

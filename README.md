@@ -1,65 +1,170 @@
-# SchemeSathi — Government Scheme Recommendation Portal
+# SchemeSathi — Advanced Multi-Factor Government Scheme Recommendation & AI Assistant Portal
 
-A full-stack MERN reference implementation for discovering and recommending government welfare schemes from a citizen profile. The core recommendation path is deterministic and explainable; the optional LLM layer only explains already-computed results.
+**SchemeSathi** is an intelligent, full-stack citizen portal for discovering, verifying, and navigating Indian Central and State government welfare schemes. 
 
-> **Important:** Seeded scheme records are explicitly marked **Demo** and are not legal/official eligibility guidance. Replace them with verified records from official government sources before a real deployment.
+It combines **100% deterministic, rule-based legal eligibility verification** (guaranteeing zero LLM hallucinations) with **multi-dimensional relevance scoring**, **category affinity**, **profile-gap unlock insights**, an interactive **What-If Eligibility Simulator**, and an **AI Assistant orchestrated via LangGraph and Groq (`llama-3.3-70b-versatile`)**.
 
-## Tech stack
+---
 
-- **Frontend:** React 18, Vite, Tailwind CSS, React Router, Axios, Lucide
-- **Backend:** Node.js, Express, MongoDB/Mongoose
-- **Authentication:** JWT in HTTP-only cookies (also accepts Bearer tokens)
-- **Recommendation engine:** deterministic rule evaluator
-- **Search:** MongoDB text search; Atlas Search can replace it in production
-- **AI assistant:** optional LangChain/Groq adapter; disabled by default
-- **RAG infrastructure:** Qdrant included in Docker Compose for expansion
-- **Jobs:** Redis included in Docker Compose for BullMQ notifications/ingestion jobs
-- **Local infrastructure:** Docker Compose (MongoDB, Redis, Qdrant)
-
-## Features
-
-- Citizen register/login/logout
-- Citizen socio-economic profile
-- Search and filter scheme directory
-- Scheme detail pages with source links
-- Rule-based eligibility states: `eligible`, `not_eligible`, `needs_verification`
-- Per-rule explanation of eligibility
-- Ranked personalized recommendations
-- Bookmarks
-- Notifications API/UI
-- Optional AI explanation of deterministic recommendations
-- Admin-only scheme creation and publication view
-- Seed script with demo citizen/admin accounts
-- Ingestion normalization scaffold for official source data
-
-## Architecture
+## 🌟 Key Highlights & Architecture
 
 ```text
-Official government sources
-        |
-        v
-Ingestion / normalization
-        |
-        v
-Admin verification
-        |
-        v
-MongoDB (structured schemes + rules)
-        |
-   +----+-------------------+
-   |                        |
-Rule engine              Search/RAG
-   |                        |
-   +-----------+------------+
-               v
-          Express API
-               |
-               v
-          React portal
+                               +-------------------------------------------------+
+                               |             Citizen Profile Attributes          |
+                               | (Age, Income, Gender, State, Occupation, etc.)  |
+                               +-----------------------+-------------------------+
+                                                       |
+                                                       v
++------------------------+             +-------------------------------+
+|  Verified Government   |             |   Deterministic Rule Engine   |
+|     Scheme Catalog     | ----------> |    (eligibilityService.js)    |
+|  (24+ Central & State) |             +---------------+---------------+
++------------------------+                             |
+                                                       v
+                               +-----------------------------------------------+
+                               |           Evaluation & Ranking Tier           |
+                               |  - Legal Verdict: Eligible / Needs Verif / DQ |
+                               |  - Category & Demographic Affinity Boost      |
+                               |  - Profile Gap Insights (Unlock Potential)    |
+                               +-----------------------+-----------------------+
+                                                       |
+                         +-----------------------------+-----------------------------+
+                         |                                                           |
+                         v                                                           v
+       +-----------------------------------+                       +-----------------------------------+
+       |     Recommendations & Insights    |                       |      LangGraph StateGraph AI      |
+       |  - What-If Simulation Engine      |                       |  - Retriever Node                 |
+       |  - Smart Filters (Status/Category)|                       |  - Evaluator Node (Facts Ground)  |
+       |  - Explainable Rule Breakdowns    |                       |  - Generator (Groq LLaMA 3.3 /    |
+       |                                   |                       |               Rule-Engine Fallback|
+       +-----------------+-----------------+                       +-----------------+-----------------+
+                         |                                                           |
+                         +-----------------------------+-----------------------------+
+                                                       |
+                                                       v
+                                       +-------------------------------+
+                                       |      React + Vite Frontend    |
+                                       |  - Citizen Hub & Dashboard    |
+                                       |  - What-If Simulator Drawer   |
+                                       |  - Rule Breakdown Modal       |
+                                       |  - Conversational Assistant   |
+                                       +-------------------------------+
 ```
 
-Eligibility is never inferred by the LLM. The rule engine evaluates structured fields stored with each verified scheme.
+---
 
+## 🚀 Core Capabilities
+
+### 1. Deterministic Rule Evaluation Engine
+- **Legal Accuracy Guarantee**: Evaluates explicit official criteria without AI approximation or guessing.
+- **Granular Checks Supported**:
+  - `Age Range`: Minimum / Maximum age thresholds.
+  - `Annual Family Income`: Income ceilings or BPL requirements.
+  - `Gender`: Female, Male, All.
+  - `Geographic Scope`: Central vs State-specific applicability (e.g., MP, Maharashtra, Delhi, Telangana, WB).
+  - `Occupation & Education`: Student, Farmer, Entrepreneur, Self-employed, Unemployed, Job Seeker, Degree levels.
+  - `Social Categories`: General, OBC, SC, ST, EWS.
+  - `Affirmative Categories`: Person with Disability (PwD), Active Farmer, BPL/AAY cardholder, Minority.
+- **Explainable Breakdown**:
+  - `passedChecks`: Explicit rules satisfied.
+  - `failedChecks`: Explicit rules violated.
+  - `missingChecks`: Unset profile attributes preventing full verification.
+  - `criticalFailureReasons`: Clear human-readable disqualification explanations.
+  - `requirementSummary`: Natural language summary (e.g., *"100% Eligible — all 4 criteria satisfied"*).
+
+### 2. Multi-Factor Hybrid Ranking & Affinity Scoring
+- **Tiered Match Priority**:
+  - **Tier 1 (100% Eligible)**: Base Score 85–100.
+  - **Tier 2 (High Match / Needs Verification)**: Base Score 65–84.
+  - **Tier 3 (Partial Match)**: Base Score 45–64.
+  - **Tier 4 (Disqualified)**: Base Score 0–40.
+- **Demographic & Category Affinity Boost**:
+  - Occupational synergy (Students $\to$ Scholarships, Farmers $\to$ Agricultural subsidies, Entrepreneurs $\to$ Credit/Loans).
+  - Demographic focus (Women empowerment, Senior Citizens, Disability assistive aids).
+  - State localization boost for programs matching the citizen's resident state.
+
+### 3. Profile Gap Insights ("Unlock Potential")
+- Scans the entire active scheme database against the citizen's profile.
+- Ranks which missing profile attributes (e.g., *Annual Income*, *State*, *Occupation*) will unlock or clarify the highest number of pending schemes.
+- Provides actionable notifications directly on the Citizen Dashboard and Recommendations Hub.
+
+### 4. Interactive "What-If" Eligibility Simulator
+- Slide income limits, switch occupations, change resident state, or toggle farmer/disability flags dynamically.
+- Evaluates hypothetical matches in-memory via `POST /api/recommendations/simulate` **without mutating the user's permanent database profile**.
+- Displays comparison statistics (e.g., *"+4 newly unlocked schemes under this scenario"*).
+
+### 5. Multi-Step AI Assistant (LangGraph + Groq LLaMA 3.3)
+- **LangGraph StateGraph Workflow**:
+  - `retrieverNode`: Understands user intent and queries candidate schemes from MongoDB.
+  - `evaluatorNode`: Evaluates deterministic eligibility rules against citizen profile and compiles 100% verified facts.
+  - `generatorNode`: Synthesizes responses using **Groq (`llama-3.3-70b-versatile`)** with zero-hallucination grounding.
+  - **Graceful Fallback**: If no Groq API key is present, automatically falls back to an intelligent deterministic rule synthesizer so the chat never fails or crashes.
+- **Conversational Chat UI**:
+  - Multi-turn conversation history.
+  - 1-click quick suggestion chips (*"Which schemes am I 100% eligible for?"*, *"What scholarships fit my education?"*, etc.).
+  - Embedded interactive Scheme Cards with direct details navigation and official portal links.
+  - Optional in-browser Groq API Key configuration drawer.
+
+---
+
+## 🏛️ Seeded Scheme Database (24 Realistic Programs)
+
+| # | Scheme Name | Category | Level | Target Demographic |
+| :--- | :--- | :--- | :--- | :--- |
+| 1 | **Pradhan Mantri Kisan Samman Nidhi (PM-KISAN)** | Agriculture | Central | Farmers (₹6,000/yr DBT) |
+| 2 | **Pradhan Mantri Fasal Bima Yojana (PMFBY)** | Agriculture | Central | Farmers (Crop Insurance) |
+| 3 | **Mukhyamantri Kisan Kalyan Yojana** | Agriculture | State (MP) | MP Farmers (₹4,000 top-up) |
+| 4 | **Rythu Bharosa / Rythu Bandhu** | Agriculture | State (Telangana) | Telangana Farmers (₹10,000/acre) |
+| 5 | **Ayushman Bharat - PM-JAY** | Healthcare | Central | Low Income / BPL (₹5 Lakh Cover) |
+| 6 | **Mahatma Jyotirao Phule Jan Arogya Yojana** | Healthcare | State (MH) | Maharashtra Residents |
+| 7 | **National Merit Scholarship** | Education | Central | College / University Students |
+| 8 | **Post-Matric Scholarship for SC/ST** | Education | Central | SC/ST Students (Full Fee Reimbursement) |
+| 9 | **National Means-cum-Merit Scholarship (NMMSS)** | Education | Central | School Students (Classes 9–12) |
+| 10 | **Kanyashree Prakalpa** | Education | State (WB) | West Bengal Girls (K1 & K2 Grants) |
+| 11 | **Delhi Ladli Scheme** | Education | State (Delhi) | Delhi Girl Child Milestone Deposits |
+| 12 | **Pudhumai Penn Scheme** | Education | State (TN) | Tamil Nadu Govt School Girls (₹1,000/mo) |
+| 13 | **PM SVANidhi** | MSME | Central | Urban Street Vendors (Micro-credit) |
+| 14 | **Pradhan Mantri MUDRA Yojana (PMMY)** | Entrepreneurship | Central | Micro-enterprises (Loans up to ₹10L) |
+| 15 | **Stand-Up India Scheme** | Entrepreneurship | Central | Women & SC/ST Greenfield Ventures |
+| 16 | **Mukhyamantri Ladli Behna Yojana** | Women & Child | State (MP) | MP Women (₹1,250/month DBT) |
+| 17 | **Sukanya Samriddhi Yojana (SSY)** | Women & Child | Central | Girl Child Savings (8.2% Tax-free) |
+| 18 | **Pradhan Mantri Awas Yojana - Urban (PMAY-U)** | Housing | Central | Urban EWS/LIG (Home Loan Subsidy) |
+| 19 | **Pradhan Mantri Awas Yojana - Gramin (PMAY-G)** | Housing | Central | Rural Pucca House Financial Grant |
+| 20 | **National Apprenticeship Promotion Scheme (NAPS)**| Skill Dev | Central | Unemployed Youth / Graduates |
+| 21 | **Mukhyamantri Yuva Sambal Yojana** | Employment | State (RJ) | Rajasthan Unemployed Graduates |
+| 22 | **Indira Gandhi National Old Age Pension (IGNOAPS)**| Social Welfare | Central | Senior Citizens (Age 60+, BPL) |
+| 23 | **Assistance to Disabled Persons for Aids (ADIP)** | Disability | Central | PwD Citizens (Free Assistive Devices) |
+| 24 | **Deendayal Antyodaya Yojana - NRLM** | Women & Child | Central | Rural Women Self-Help Groups (SHGs) |
+
+---
+
+## 👥 Demo Personas for Testing
+
+All test accounts share the password: `Demo@123`
+
+| Persona | Email | Key Attributes | Target Test Schemes |
+| :--- | :--- | :--- | :--- |
+| **Student** | `demo@schemesathi.local` | Age 21, Female, Delhi, SC, Income ₹1.8L | Post-Matric SC/ST, National Merit, Delhi Ladli |
+| **Farmer** | `farmer@schemesathi.local` | Age 42, Male, MP, Rural, OBC, Income ₹1.2L | PM-KISAN, PMFBY, MP Kisan Kalyan |
+| **Entrepreneur**| `entrepreneur@schemesathi.local` | Age 34, Female, Maharashtra, Urban, Self-employed | Stand-Up India, PM MUDRA, MJPJAY Health |
+| **Senior Citizen**| `senior@schemesathi.local` | Age 67, Male, UP, Rural, BPL Cardholder | IGNOAPS Old Age Pension, Ayushman Bharat |
+| **PwD Seeker** | `pwd@schemesathi.local` | Age 24, Male, Haryana, PwD, Job Seeker | ADIP Disability Aids, NAPS Apprenticeship |
+| **Admin** | `admin@schemesathi.local` | Role: `admin` (Password: `Admin@123`) | Scheme Management & Verification |
+
+---
+
+## 🛠️ Technology Stack
+
+- **Frontend**: React 18, Vite, Tailwind CSS, React Router v6, Axios, Lucide Icons
+- **Backend**: Node.js (ESM), Express, MongoDB, Mongoose ODM
+- **AI & Agent Orchestration**:
+  - **LangGraph** (`@langchain/langgraph`): Multi-step state machine (`retriever` $\to$ `evaluator` $\to$ `generator`)
+  - **LangChain Groq** (`@langchain/groq`): `llama-3.3-70b-versatile`
+  - **LangChain Google GenAI** (`@langchain/google-genai`): Fallback Gemini adapter
+- **Vector & Queue Infrastructure (Included)**: Qdrant vector database, Redis & BullMQ
+- **Authentication**: JWT with HTTP-only cookies and Bearer token fallback
+
+---
 ## 1. Requirements
 
 - Node.js 20+
@@ -136,106 +241,92 @@ npm run dev
 - API: http://localhost:5000
 - Health: http://localhost:5000/api/health
 
-## Recommendation design
+## 📡 API Reference
 
-Each scheme stores normalized eligibility rules, e.g.:
+### Recommendations & Simulation
+- `GET /api/recommendations`
+  - Query params: `category`, `status`, `level`, `minScore`, `search`, `sortBy`, `limit`, `includeIneligible`.
+  - Returns: `{ recommendations, stats: { total, eligibleCount, needsVerificationCount, notEligibleCount, categoryCounts } }`.
+- `POST /api/recommendations/simulate`
+  - Body: `{ profile: { ...hypotheticalProfile } }`.
+  - Returns: `{ recommendations, stats, simulationStats: { totalEligible, newlyEligibleCount, newlyEligibleSchemes } }`.
+- `GET /api/recommendations/insights`
+  - Returns: `{ profileCompleteness, completedCount, totalTrackedFields, highImpactFields, summary }`.
+- `POST /api/recommendations/check`
+  - Body: `{ schemeId, profile? }`.
+  - Returns: Detailed deterministic rule checks for a specific scheme.
 
-```json
-{
-  "age": { "min": 18, "max": 30 },
-  "income": { "max": 250000 },
-  "occupations": ["Student"],
-  "education": ["Undergraduate"],
-  "socialCategories": ["SC", "ST"]
-}
-```
+### AI Assistant
+- `POST /api/assistant/chat`
+  - Body: `{ question, history?, apiKey?, profile? }`.
+  - Runs LangGraph StateGraph workflow (`retriever` $\to$ `evaluator` $\to$ `generator`).
+  - Returns: `{ answer, recommendations, mode, modelUsed }`.
 
-The evaluator returns:
+### Citizen Profile
+- `GET /api/profile`: Get authenticated citizen profile.
+- `PUT /api/profile`: Update profile fields (`age`, `income`, `occupation`, `state`, `maritalStatus`, `disability`, `farmer`, `bplCard`, etc.).
 
-```json
-{
-  "status": "eligible",
-  "matchScore": 100,
-  "checks": [
-    {
-      "label": "Age",
-      "required": "18–30",
-      "actual": 21,
-      "pass": true
-    }
-  ]
-}
-```
+---
 
-Rules that fail make the status `not_eligible`. Required rules that cannot be evaluated because a profile value is missing produce `needs_verification`.
-
-## Adding real government scheme data
-
-Use authoritative sources and respect their terms/robots/access rules. A robust pipeline is:
-
-```text
-Official API/page/PDF
-    -> raw snapshot
-    -> extractor/normalizer
-    -> pending verification
-    -> admin review
-    -> verified Scheme record
-    -> recommendations
-```
-
-`server/src/ingestion/normalizeScheme.js` is the starting adapter. Keep the source URL and verification timestamp on every record.
-
-## Enabling AI explanations
-
-AI is intentionally off by default.
-
-In `server/.env`:
-
-```env
-ENABLE_AI=true
-GROQ_API_KEY=your_key
-```
-
-The assistant first calls the normal recommendation engine, then gives those structured results to the model with an instruction not to invent eligibility.
-
-For production RAG, ingest verified official documents into Qdrant and retrieve only documents tied to the selected scheme/source. The current code includes Qdrant infrastructure but does not automatically scrape public websites.
-
-## Production checklist
-
-- Replace demo scheme data with verified official records
-- Use HTTPS
-- Use a strong JWT secret or managed secret store
-- Restrict CORS to the deployed frontend
-- Add CSRF protection for cookie-authenticated state changes
-- Add input validation/rate limiting/Helmet
-- Add email/phone verification if needed
-- Encrypt sensitive data at rest
-- Minimize profile fields and add clear consent/privacy language
-- Add audit logs for admin scheme changes
-- Add scheme version history and source snapshots
-- Add tests around every eligibility rule type
-- Verify accessibility and multilingual content
-- Do not claim final government eligibility; link to the official application portal
-
-## Project structure
+## 📂 Project Structure
 
 ```text
 gov-scheme-portal/
 ├── client/
-│   └── src/
-│       ├── components/
-│       ├── lib/
-│       └── pages/
+│   ├── src/
+│   │   ├── components/
+│   │   │   ├── Layout.jsx               # Navigation bar & shell
+│   │   │   ├── ProtectedRoute.jsx       # Auth route guard
+│   │   │   └── SchemeCard.jsx           # Match badges, progress bar, rule trigger
+│   │   ├── lib/
+│   │   │   ├── api.js                   # Axios client with credentials
+│   │   │   └── AuthContext.jsx          # Authentication state provider
+│   │   └── pages/
+│   │       ├── Assistant.jsx            # LangGraph conversational chat UI
+│   │       ├── Dashboard.jsx            # Citizen stats & profile strength
+│   │       ├── Profile.jsx              # Demographic & criteria form
+│   │       ├── Recommendations.jsx      # Hub with What-If Simulator & Rule Modal
+│   │       ├── SchemeDetail.jsx         # Full breakdown, benefits & process
+│   │       └── Schemes.jsx              # Global searchable catalog
+│   ├── package.json
+│   └── vite.config.js
+│
 ├── server/
-│   └── src/
-│       ├── controllers/
-│       ├── ingestion/
-│       ├── middleware/
-│       ├── models/
-│       ├── routes/
-│       ├── services/
-│       └── utils/
-├── docs/API.md
+│   ├── src/
+│   │   ├── ai/
+│   │   │   └── schemeAssistantGraph.js  # Compiled LangGraph StateGraph workflow
+│   │   ├── controllers/
+│   │   │   ├── aiController.js          # Chat endpoint handler
+│   │   │   ├── profileController.js     # Citizen profile CRUD
+│   │   │   ├── recommendationController.js # Recommendations, Simulator, Insights
+│   │   │   └── schemeController.js      # Scheme management
+│   │   ├── models/
+│   │   │   ├── Scheme.js                # Scheme schema with rule ranges & criteria
+│   │   │   └── User.js                  # Citizen profile schema
+│   │   ├── routes/
+│   │   │   ├── aiRoutes.js              # /api/assistant
+│   │   │   └── recommendationRoutes.js  # /api/recommendations
+│   │   ├── services/
+│   │   │   ├── aiService.js             # Assistant orchestration service
+│   │   │   ├── eligibilityService.js    # Deterministic rule evaluation engine
+│   │   │   └── recommendationService.js # Hybrid ranking & gap insights engine
+│   │   ├── seed.js                      # 24 schemes & 5 personas database seeder
+│   │   ├── test-recommendations.js      # 8 algorithmic verification tests
+│   │   └── test-ai-assistant.js         # LangGraph workflow test suite
+│   ├── package.json
+│   └── .env
+│
 ├── docker-compose.yml
-└── README.md
+├── README.md                            # Original reference README
+└── README2.md                           # Comprehensive project documentation
 ```
+
+---
+
+## 🔒 Security & Privacy Practices
+
+1. **Zero Hallucination Eligibility**: AI models are never used to decide legal eligibility. All decisions derive deterministically from official criteria.
+2. **Non-Destructive Simulation**: The What-If Simulator performs evaluations entirely in memory without writing changes to the citizen's profile.
+3. **Data Minimization**: Citizens provide only the attributes they wish to be evaluated against.
+4. **Official Portals Grounding**: Every scheme includes verified official portal links so citizens submit applications directly through government departments.
+

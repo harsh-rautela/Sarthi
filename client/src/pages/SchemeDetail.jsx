@@ -1,5 +1,135 @@
-import { useEffect, useState } from 'react'; import { useParams } from 'react-router-dom'; import api from '../lib/api'; import { useAuth } from '../lib/AuthContext';
-export default function SchemeDetail(){const {id}=useParams(); const {user}=useAuth();const [scheme,setScheme]=useState(null);const [evaluation,setEvaluation]=useState(null);useEffect(()=>{api.get(`/schemes/${id}`).then(async r=>{setScheme(r.data.scheme); if(user){try{const c=await api.post('/recommendations/check',{schemeId:r.data.scheme._id});setEvaluation(c.data.evaluation)}catch{}}})},[id,user]);if(!scheme)return <div>Loading…</div>;
- return <div className="space-y-5"><section className="card p-7"><div className="flex flex-wrap items-start justify-between gap-4"><div><span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">{scheme.category}</span><h1 className="mt-3 text-3xl font-black">{scheme.name}</h1><p className="mt-2 text-sm text-slate-500">{scheme.ministry} · {scheme.level}</p></div>{scheme.officialUrl&&<a className="btn-primary" href={scheme.officialUrl} target="_blank" rel="noreferrer">Open official portal</a>}</div><p className="mt-6 max-w-4xl leading-7 text-slate-700">{scheme.description}</p></section>
- {evaluation&&<section className="card p-6"><div className="flex justify-between gap-4"><div><h2 className="text-xl font-black">Eligibility check</h2><p className="text-sm text-slate-500">Based on your saved profile.</p></div><div className="text-right"><div className="text-2xl font-black">{evaluation.matchScore}%</div><div className="text-xs uppercase text-slate-500">{evaluation.status.replace('_',' ')}</div></div></div><div className="mt-5 divide-y">{evaluation.checks.map((c,i)=><div key={i} className="grid gap-2 py-3 sm:grid-cols-[160px_1fr_1fr_auto]"><strong>{c.label}</strong><span className="text-sm text-slate-600">Required: {c.required}</span><span className="text-sm text-slate-600">You: {String(c.actual)}</span><span className={c.pass===true?'text-green-700':c.pass===false?'text-red-700':'text-amber-700'}>{c.pass===true?'✓ Match':c.pass===false?'✕ No match':'? Missing'}</span></div>)}</div><p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">Final eligibility is determined by the concerned department. Verify current criteria on the official source before applying.</p></section>}
- <div className="grid gap-5 lg:grid-cols-2"><section className="card p-6"><h2 className="text-xl font-black">Benefits</h2><ul className="mt-4 list-disc space-y-2 pl-5 text-slate-700">{scheme.benefits?.map(x=><li key={x}>{x}</li>)}</ul></section><section className="card p-6"><h2 className="text-xl font-black">Documents required</h2><ul className="mt-4 list-disc space-y-2 pl-5 text-slate-700">{scheme.documentsRequired?.map(x=><li key={x}>{x}</li>)}</ul></section></div><section className="card p-6"><h2 className="text-xl font-black">Application process</h2><ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">{scheme.applicationProcess?.map(x=><li key={x}>{x}</li>)}</ol></section></div>}
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import api from "../lib/api";
+import { useAuth } from "../lib/AuthContext";
+export default function SchemeDetail() {
+  const { id } = useParams();
+  const { user } = useAuth();
+  const [scheme, setScheme] = useState(null);
+  const [evaluation, setEvaluation] = useState(null);
+  useEffect(() => {
+    api.get(`/schemes/${id}`).then(async (r) => {
+      setScheme(r.data.scheme);
+      if (user) {
+        try {
+          const c = await api.post("/recommendations/check", {
+            schemeId: r.data.scheme._id,
+          });
+          setEvaluation(c.data.evaluation);
+        } catch {}
+      }
+    });
+  }, [id, user]);
+  if (!scheme) return <div>Loading…</div>;
+  return (
+    <div className="space-y-5">
+      <section className="card p-7">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-800">
+              {scheme.category}
+            </span>
+            <h1 className="mt-3 text-3xl font-black">{scheme.name}</h1>
+            <p className="mt-2 text-sm text-slate-500">
+              {scheme.ministry} · {scheme.level}
+            </p>
+          </div>
+          {scheme.officialUrl && (
+            <a
+              className="btn-primary"
+              href={scheme.officialUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open official portal
+            </a>
+          )}
+        </div>
+        <p className="mt-6 max-w-4xl leading-7 text-slate-700">
+          {scheme.description}
+        </p>
+      </section>
+      {evaluation && (
+        <section className="card p-6">
+          <div className="flex justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-black">Eligibility check</h2>
+              <p className="text-sm text-slate-500">
+                Based on your saved profile.
+              </p>
+            </div>
+            <div className="text-right">
+              <div className="text-2xl font-black">
+                {evaluation.matchScore}%
+              </div>
+              <div className="text-xs uppercase text-slate-500">
+                {evaluation.status.replace("_", " ")}
+              </div>
+            </div>
+          </div>
+          <div className="mt-5 divide-y">
+            {evaluation.checks.map((c, i) => (
+              <div
+                key={i}
+                className="grid gap-2 py-3 sm:grid-cols-[160px_1fr_1fr_auto]"
+              >
+                <strong>{c.label}</strong>
+                <span className="text-sm text-slate-600">
+                  Required: {c.required}
+                </span>
+                <span className="text-sm text-slate-600">
+                  You: {String(c.actual)}
+                </span>
+                <span
+                  className={
+                    c.pass === true
+                      ? "text-green-700"
+                      : c.pass === false
+                        ? "text-red-700"
+                        : "text-amber-700"
+                  }
+                >
+                  {c.pass === true
+                    ? "✓ Match"
+                    : c.pass === false
+                      ? "✕ No match"
+                      : "? Missing"}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="mt-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-900">
+            Final eligibility is determined by the concerned department. Verify
+            current criteria on the official source before applying.
+          </p>
+        </section>
+      )}
+      <div className="grid gap-5 lg:grid-cols-2">
+        <section className="card p-6">
+          <h2 className="text-xl font-black">Benefits</h2>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-slate-700">
+            {scheme.benefits?.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
+        </section>
+        <section className="card p-6">
+          <h2 className="text-xl font-black">Documents required</h2>
+          <ul className="mt-4 list-disc space-y-2 pl-5 text-slate-700">
+            {scheme.documentsRequired?.map((x) => (
+              <li key={x}>{x}</li>
+            ))}
+          </ul>
+        </section>
+      </div>
+      <section className="card p-6">
+        <h2 className="text-xl font-black">Application process</h2>
+        <ol className="mt-4 list-decimal space-y-2 pl-5 text-slate-700">
+          {scheme.applicationProcess?.map((x) => (
+            <li key={x}>{x}</li>
+          ))}
+        </ol>
+      </section>
+    </div>
+  );
+}

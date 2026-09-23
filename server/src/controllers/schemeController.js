@@ -13,6 +13,7 @@ export const listSchemes = asyncHandler(async (req, res) => {
     Scheme.find(filter).sort(q ? { score: { $meta: 'textScore' } } : { updatedAt: -1 }).skip(skip).limit(Number(limit)).lean(),
     Scheme.countDocuments(filter)
   ]);
+  
   res.json({ items, total, page: Number(page), pages: Math.ceil(total / Number(limit)) });
 });
 
